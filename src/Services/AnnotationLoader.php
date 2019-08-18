@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Headsnet\LivingDocumentationBundle\Services;
 
 use HaydenPierce\ClassFinder\ClassFinder;
-use Headsnet\LivingDocumentationBundle\Annotation\LivingDocumentationAnnotation;
+use Headsnet\LivingDocumentation\Annotation\LivingDocumentationAnnotation;
 use Headsnet\LivingDocumentationBundle\Event\PublishDocumentation;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -57,7 +57,7 @@ final class AnnotationLoader
                 if ($annotation instanceof LivingDocumentationAnnotation)
                 {
                     $key = str_replace('\\', '_',
-                           str_replace('Headsnet\LivingDocumentationBundle\Annotation\\', '',
+                           str_replace('Headsnet\LivingDocumentation\Annotation\\', '',
                                get_class($annotation))
                     );
 

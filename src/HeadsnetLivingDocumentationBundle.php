@@ -1,5 +1,5 @@
 <?php
-namespace Headsnet\LivingDocumentation;
+namespace Headsnet\LivingDocumentationBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
