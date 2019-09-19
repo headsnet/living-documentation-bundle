@@ -1,0 +1,18 @@
+
+Model Documentation for: {{ namespace }}
+==
+
+{% if data.Infrastructure_ConsoleCommand is defined %}
+## Console Commands
+
+{% for result in data.Infrastructure_ConsoleCommand %}
+#### _{{ result.annotation.commandName }}_
+{% if result.annotation.description %}
+
+{{ result.annotation.description }}
+{% endif %}
+
+`{{ namespace }}{{ result.class }}`
+
+{% endfor %}
+{% endif %}
