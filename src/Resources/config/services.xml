@@ -25,6 +25,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="headsnet_livedoc.subscriber.guided_tour" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishGuidedTour">
+            <argument type="service" id="twig"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="headsnet_livedoc.subscriber.use_cases" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishUseCases">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>

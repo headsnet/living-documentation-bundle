@@ -1,0 +1,15 @@
+
+Model Documentation for: {{ namespace }}
+==
+
+{% if data is defined %}
+## Guided Tour: ({{ tour }})
+
+{% for result in data %}
+#### {{ result.shortClass }}
+_{{ result.annotation.description }}_
+
+`{{ namespace }}{{ result.class }}`
+
+{% endfor %}
+{% endif %}
