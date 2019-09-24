@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Headsnet\LivingDocumentationBundle\EventSubscriber;
 
 use Cocur\Slugify\Slugify;
+use Headsnet\LivingDocumentation\Annotation\CuratedContent\GuidedTour;
 use Headsnet\LivingDocumentationBundle\Event\PublishDocumentation;
+use Headsnet\LivingDocumentationBundle\Model\DocEntry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -77,39 +79,45 @@ final class PublishGuidedTour extends BasePublisher implements EventSubscriberIn
      */
     private function getTourNames(array $data): array
     {
-        $tours = array_unique(array_map(function (array $guidedTour) {
-            return $guidedTour['annotation']->getName();
-        }, $data['CuratedContent_GuidedTour']));
+        $tours = array_unique(array_map(function (DocEntry $docEntry)
+        {
+            /** @var GuidedTour $annotation */
+            $annotation = $docEntry->annotation();
+
+            return $annotation->getName();
+        }, $data['CuratedContent_GuidedTour'] ?? []));
 
         return $tours;
     }
 
     /**
-     * @param PublishDocumentation $event
-     * @param                      $tour
+     * @param DocEntry[] $data
+     * @param string     $tour
      *
      * @return array
      */
     private function getTourWaypoints(array $data, $tour): array
     {
-        return $tourData = array_filter($data['CuratedContent_GuidedTour'], function (array $tourWaypoint) use ($tour)
+        return $tourData = array_filter($data['CuratedContent_GuidedTour'], function (DocEntry $docEntry) use ($tour)
         {
-            return $tourWaypoint['annotation']->getName() === $tour;
+            return $docEntry->annotation()->getName() === $tour;
         });
     }
 
     /**
+     * @param DocEntry[] $tourWaypoints
+     *
      * @return array
      */
-    private function sortTourWaypoints($tourWaypoints): array
+    private function sortTourWaypoints(array $tourWaypoints): array
     {
-        usort($tourWaypoints, function (array $a, array $b) {
-            if ($a['annotation']->getRank() == $b['annotation']->getRank())
+        usort($tourWaypoints, function (DocEntry $a, DocEntry $b) {
+            if ($a->annotation()->getRank() == $b->annotation()->getRank())
             {
                 return 0;
             }
 
-            return ($a['annotation']->getRank() < $b['annotation']->getRank()) ? -1 : 1;
+            return ($a->annotation()->getRank() < $b->annotation()->getRank()) ? -1 : 1;
         });
 
         return $tourWaypoints;

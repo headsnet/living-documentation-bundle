@@ -6,6 +6,7 @@ namespace Headsnet\LivingDocumentationBundle\Services;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Headsnet\LivingDocumentation\Annotation\LivingDocumentationAnnotation;
 use Headsnet\LivingDocumentationBundle\Event\PublishDocumentation;
+use Headsnet\LivingDocumentationBundle\Model\DocEntry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -61,16 +62,12 @@ final class AnnotationLoader
                                get_class($annotation))
                     );
 
-                    $data[$key][] = [
-                        'class' => $inspectedClass,
-                        'shortClass' => (new \ReflectionClass($namespace.$inspectedClass))->getShortName(),
-                        'annotation' => $annotation
-                    ];
+                    $shortName = (new \ReflectionClass($namespace.$inspectedClass))->getShortName();
+
+                    $data[$key][] = new DocEntry($inspectedClass, $shortName, $annotation);
                 }
             }
         }
-
-        //dd($data);
 
         $event = new PublishDocumentation($data, $namespace, $context, $outDir);
         $this->eventDispatcher->dispatch($event);

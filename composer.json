@@ -10,6 +10,7 @@
   },
   "require": {
     "php": ">=7.1",
+    "cocur/slugify": "^2.0|3.0",
     "haydenpierce/class-finder": "^0.3.3",
     "headsnet/living-documentation": "dev-master",
     "symfony/console": "^4.0",
