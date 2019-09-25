@@ -5,6 +5,8 @@
 
     <services>
 
+        <service id="headsnet_livedoc.processor.guided_tour_builder" class="Headsnet\LivingDocumentationBundle\Services\Processor\GuidedTourBuilder"/>
+
         <service id="headsnet_livedoc.subscriber.console_commands" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishConsoleCommands">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>
@@ -27,6 +29,7 @@
 
         <service id="headsnet_livedoc.subscriber.guided_tour" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishGuidedTour">
             <argument type="service" id="twig"/>
+            <argument type="service" id="headsnet_livedoc.processor.guided_tour_builder"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Headsnet\LivingDocumentationBundle\EventSubscriber;
 
 use Cocur\Slugify\Slugify;
-use Headsnet\LivingDocumentation\Annotation\CuratedContent\GuidedTour;
 use Headsnet\LivingDocumentationBundle\Event\PublishDocumentation;
-use Headsnet\LivingDocumentationBundle\Model\DocEntry;
+use Headsnet\LivingDocumentationBundle\Services\Processor\GuidedTourBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Twig\Environment;
 use Twig\Error\Error;
 
 /**
@@ -18,6 +18,22 @@ use Twig\Error\Error;
 final class PublishGuidedTour extends BasePublisher implements EventSubscriberInterface
 {
     protected $template = 'guided-tour';
+
+    /**
+     * @var GuidedTourBuilder
+     */
+    private $builder;
+
+    /**
+     * @param Environment       $twig
+     * @param GuidedTourBuilder $builder
+     */
+    public function __construct(Environment $twig, GuidedTourBuilder $builder)
+    {
+        parent::__construct($twig);
+
+        $this->builder = $builder;
+    }
 
     /**
      * @param PublishDocumentation $event
@@ -33,33 +49,16 @@ final class PublishGuidedTour extends BasePublisher implements EventSubscriberIn
 
         try
         {
-            $tours = $this->getTourNames($event->getData());
-
-            $slugify = new Slugify();
+            $tours = $this->builder->getTourNames($event->getData());
 
             foreach ($tours as $tour)
             {
-                $tourWaypoints = $this->sortTourWaypoints(
-                    $this->getTourWaypoints($event->getData(), $tour)
+                $tourWaypoints = $this->builder->sortTourWaypoints(
+                    $this->builder->getTourWaypoints($event->getData(), $tour)
                 );
 
-                $markdown = $this->twig->render(sprintf('%s.html.twig', $this->template), [
-                    'data' => $tourWaypoints,
-                    'namespace' => $event->getNamespace(),
-                    'tour' => $tour
-                ]);
-
-                $filesystem = new Filesystem();
-
-                $filesystem->dumpFile(
-                    sprintf(
-                        '%s%s/%s/%s.md',
-                        $event->getOutDir(),
-                        $event->getContext(),
-                        $this->template, $slugify->slugify($tour)
-                    ),
-                    $markdown
-                );
+                $this->writeMarkdownFile($event, $tourWaypoints, $tour);
+                $this->writePumlFile($event, $tourWaypoints, $tour);
             }
         }
         catch (Error $exception)
@@ -73,53 +72,55 @@ final class PublishGuidedTour extends BasePublisher implements EventSubscriberIn
     }
 
     /**
-     * @param array $data
+     * @param PublishDocumentation $event
+     * @param array                $tourWaypoints
+     * @param                      $tour
      *
-     * @return array
+     * @throws Error
      */
-    private function getTourNames(array $data): array
+    private function writeMarkdownFile(PublishDocumentation $event, array $tourWaypoints, $tour): void
     {
-        $tours = array_unique(array_map(function (DocEntry $docEntry)
-        {
-            /** @var GuidedTour $annotation */
-            $annotation = $docEntry->annotation();
+        $markdown = $this->twig->render(sprintf('%s.html.twig', $this->template), [
+            'data'      => $tourWaypoints,
+            'namespace' => $event->getNamespace(),
+            'tour'      => $tour
+        ]);
 
-            return $annotation->getName();
-        }, $data['CuratedContent_GuidedTour'] ?? []));
-
-        return $tours;
+        (new Filesystem())->dumpFile(
+            sprintf(
+                '%s%s/%s/%s.md',
+                $event->getOutDir(),
+                $event->getContext(),
+                $this->template, (new Slugify())->slugify($tour)
+            ),
+            $markdown
+        );
     }
 
     /**
-     * @param DocEntry[] $data
-     * @param string     $tour
+     * @param PublishDocumentation $event
+     * @param array                $tourWaypoints
+     * @param                      $tour
      *
-     * @return array
+     * @throws Error
      */
-    private function getTourWaypoints(array $data, $tour): array
+    private function writePumlFile(PublishDocumentation $event, array $tourWaypoints, $tour): void
     {
-        return $tourData = array_filter($data['CuratedContent_GuidedTour'], function (DocEntry $docEntry) use ($tour)
-        {
-            return $docEntry->annotation()->getName() === $tour;
-        });
-    }
+        $markdown = $this->twig->render(sprintf('diagram/%s.puml.twig', $this->template), [
+            'data'      => $tourWaypoints,
+            'namespace' => $event->getNamespace(),
+            'tour'      => $tour
+        ]);
 
-    /**
-     * @param DocEntry[] $tourWaypoints
-     *
-     * @return array
-     */
-    private function sortTourWaypoints(array $tourWaypoints): array
-    {
-        usort($tourWaypoints, function (DocEntry $a, DocEntry $b) {
-            if ($a->annotation()->getRank() == $b->annotation()->getRank())
-            {
-                return 0;
-            }
-
-            return ($a->annotation()->getRank() < $b->annotation()->getRank()) ? -1 : 1;
-        });
-
-        return $tourWaypoints;
+        (new Filesystem())->dumpFile(
+            sprintf(
+                '%s%s/%s/%s.puml',
+                $event->getOutDir(),
+                $event->getContext(),
+                $this->template,
+                (new Slugify())->slugify($tour)
+            ),
+            $markdown
+        );
     }
 }

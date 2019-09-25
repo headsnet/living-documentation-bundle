@@ -1,0 +1,9 @@
+@startuml
+title {{ tour }}
+{% for result in data %}
+:{{ result.shortClass }};
+note right
+	{{ result.annotation.description }}
+end note
+{% endfor %}
+@enduml
