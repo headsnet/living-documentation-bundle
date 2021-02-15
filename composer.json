@@ -13,9 +13,9 @@
     "cocur/slugify": "^2.0|^3.0",
     "haydenpierce/class-finder": "^0.3.3",
     "headsnet/living-documentation": "dev-master",
-    "symfony/console": "^4.0",
-    "symfony/event-dispatcher": "^4.0",
-    "symfony/filesystem": "^4.0",
+    "symfony/console": "^4.0|^5.0",
+    "symfony/event-dispatcher": "^4.0|^5.0",
+    "symfony/filesystem": "^4.0|^5.0",
     "twig/twig": "^2.0"
   },
   "autoload": {
