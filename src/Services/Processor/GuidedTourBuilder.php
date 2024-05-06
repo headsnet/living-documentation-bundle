@@ -6,57 +6,41 @@ namespace Headsnet\LivingDocumentationBundle\Services\Processor;
 use Headsnet\LivingDocumentation\Annotation\CuratedContent\GuidedTour;
 use Headsnet\LivingDocumentationBundle\Model\DocEntry;
 
-/**
- * Class
- */
 final class GuidedTourBuilder
 {
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
     public function getTourNames(array $data): array
     {
-        $tours = array_unique(array_map(function (DocEntry $docEntry)
-        {
-            /** @var GuidedTour $annotation */
-            $annotation = $docEntry->annotation();
+        return array_unique(array_map(function (DocEntry $docEntry): string {
+            /** @var GuidedTour $attribute */
+            $attribute = $docEntry->attribute();
 
-            return $annotation->getName();
+            return $attribute->getName();
         }, $data['CuratedContent_GuidedTour'] ?? []));
-
-        return $tours;
     }
 
     /**
-     * @param DocEntry[] $data
-     * @param string     $tour
-     *
-     * @return array
+     * @param array<DocEntry> $data
      */
-    public function getTourWaypoints(array $data, $tour): array
+    public function getTourWaypoints(array $data, string $tour): array
     {
-        return $tourData = array_filter($data['CuratedContent_GuidedTour'], function (DocEntry $docEntry) use ($tour)
-        {
-            return $docEntry->annotation()->getName() === $tour;
-        });
+        return $tourData = array_filter(
+            $data['CuratedContent_GuidedTour'],
+            fn (DocEntry $docEntry) => $docEntry->attribute()
+                ->getName() === $tour
+        );
     }
 
     /**
-     * @param DocEntry[] $tourWaypoints
-     *
-     * @return array
+     * @param array<DocEntry> $tourWaypoints
      */
     public function sortTourWaypoints(array $tourWaypoints): array
     {
         usort($tourWaypoints, function (DocEntry $a, DocEntry $b) {
-            if ($a->annotation()->getRank() == $b->annotation()->getRank())
-            {
+            if ($a->attribute()->getRank() == $b->attribute()->getRank()) {
                 return 0;
             }
 
-            return ($a->annotation()->getRank() < $b->annotation()->getRank()) ? -1 : 1;
+            return ($a->attribute()->getRank() < $b->attribute()->getRank()) ? -1 : 1;
         });
 
         return $tourWaypoints;

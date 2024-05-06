@@ -7,7 +7,7 @@ Model Documentation for: {{ namespace }}
 
 {% for result in data.Patterns_Command %}
 #### {{ result.shortClass }}
-_{{ result.annotation.value|default('No description available') }}_
+_{{ result.attribute.value|default('No description available') }}_
 
 `{{ namespace }}{{ result.class }}`
 

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Headsnet\LivingDocumentationBundle\EventSubscriber;
+namespace Headsnet\LivingDocumentationBundle\Publisher;
 
 use Cocur\Slugify\Slugify;
-use Headsnet\LivingDocumentationBundle\Event\PublishDocumentation;
 use Headsnet\LivingDocumentationBundle\Services\Processor\GuidedTourBuilder;
+use Headsnet\LivingDocumentationBundle\Services\PublishDocumentation;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -17,42 +17,26 @@ use Twig\Error\Error;
  */
 final class PublishGuidedTour extends BasePublisher implements EventSubscriberInterface
 {
-    protected $template = 'guided-tour';
+    protected string $template = 'guided-tour';
 
-    /**
-     * @var GuidedTourBuilder
-     */
-    private $builder;
-
-    /**
-     * @param Environment       $twig
-     * @param GuidedTourBuilder $builder
-     */
-    public function __construct(Environment $twig, GuidedTourBuilder $builder)
-    {
+    public function __construct(
+        Environment $twig,
+        private readonly GuidedTourBuilder $builder
+    ) {
         parent::__construct($twig);
-
-        $this->builder = $builder;
     }
 
-    /**
-     * @param PublishDocumentation $event
-     *
-     * @throws \Exception
-     */
-    public function build(PublishDocumentation $event)
+    #[\Override]
+    public function build(PublishDocumentation $event): void
     {
-        if (empty($this->template))
-        {
+        if (empty($this->template)) {
             throw new \Exception('Publisher template must be specified!');
         }
 
-        try
-        {
+        try {
             $tours = $this->builder->getTourNames($event->getData());
 
-            foreach ($tours as $tour)
-            {
+            foreach ($tours as $tour) {
                 $tourWaypoints = $this->builder->sortTourWaypoints(
                     $this->builder->getTourWaypoints($event->getData(), $tour)
                 );
@@ -61,29 +45,20 @@ final class PublishGuidedTour extends BasePublisher implements EventSubscriberIn
                 $this->writePumlFile($event, $tourWaypoints, $tour);
             }
         }
-        catch (Error $exception)
-        {
+        catch (Error $exception) {
             die('Error rendering output template:' . $exception->getMessage());
         }
-        catch (IOException $exception)
-        {
+        catch (IOException $exception) {
             die('Error writing output file:' . $exception->getMessage());
         }
     }
 
-    /**
-     * @param PublishDocumentation $event
-     * @param array                $tourWaypoints
-     * @param                      $tour
-     *
-     * @throws Error
-     */
     private function writeMarkdownFile(PublishDocumentation $event, array $tourWaypoints, $tour): void
     {
         $markdown = $this->twig->render(sprintf('%s.html.twig', $this->template), [
-            'data'      => $tourWaypoints,
+            'data' => $tourWaypoints,
             'namespace' => $event->getNamespace(),
-            'tour'      => $tour
+            'tour' => $tour,
         ]);
 
         (new Filesystem())->dumpFile(
@@ -91,25 +66,19 @@ final class PublishGuidedTour extends BasePublisher implements EventSubscriberIn
                 '%s%s/%s/%s.md',
                 $event->getOutDir(),
                 $event->getContext(),
-                $this->template, (new Slugify())->slugify($tour)
+                $this->template,
+                (new Slugify())->slugify($tour)
             ),
             $markdown
         );
     }
 
-    /**
-     * @param PublishDocumentation $event
-     * @param array                $tourWaypoints
-     * @param                      $tour
-     *
-     * @throws Error
-     */
     private function writePumlFile(PublishDocumentation $event, array $tourWaypoints, $tour): void
     {
         $markdown = $this->twig->render(sprintf('diagram/%s.puml.twig', $this->template), [
-            'data'      => $tourWaypoints,
+            'data' => $tourWaypoints,
             'namespace' => $event->getNamespace(),
-            'tour'      => $tour
+            'tour' => $tour,
         ]);
 
         (new Filesystem())->dumpFile(

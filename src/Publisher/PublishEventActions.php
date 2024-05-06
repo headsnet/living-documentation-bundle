@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Headsnet\LivingDocumentationBundle\EventSubscriber;
+namespace Headsnet\LivingDocumentationBundle\Publisher;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -10,5 +10,5 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class PublishEventActions extends BasePublisher implements EventSubscriberInterface
 {
-    protected $template = 'event-actions';
+    protected string $template = 'event-actions';
 }

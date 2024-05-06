@@ -3,43 +3,27 @@ declare(strict_types=1);
 
 namespace Headsnet\LivingDocumentationBundle\Console;
 
-use Headsnet\LivingDocumentationBundle\Services\AnnotationLoader;
+use Headsnet\LivingDocumentationBundle\Services\AttributeLoader;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Command
- */
+#[AsCommand(name: 'headsnet:livedoc:publish', description: 'Publish documentation')]
 class PublishCommand extends Command
 {
-    /**
-     * @var AnnotationLoader
-     */
-    private $parser;
-
-    /**
-     * Constructor
-     *
-     * @param AnnotationLoader $parser
-     */
-	public function __construct(AnnotationLoader $parser)
-	{
-		parent::__construct();
-
-        $this->parser = $parser;
+    public function __construct(
+        private readonly AttributeLoader $parser
+    ) {
+        parent::__construct();
     }
 
-	/**
-	 * Configure the Symfony command
-	 */
-	protected function configure()
-	{
-		$this
-			->setName('headsnet:livedoc:publish')
-			->setDescription('Publish documentation')
+    #[\Override]
+    protected function configure(): void
+    {
+        $this
             ->addArgument(
                 'namespace',
                 InputArgument::REQUIRED,
@@ -60,23 +44,17 @@ class PublishCommand extends Command
                 'docs/'
             )
         ;
-	}
+    }
 
-	/**
-	 * Execute the Symfony command
-	 *
-	 * @param InputInterface  $input
-	 * @param OutputInterface $output
-	 *
-	 * @return void
-	 * @throws \Exception
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
+    #[\Override]
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $this->parser->load(
             $input->getArgument('namespace'),
             $input->getOption('context'),
             $input->getOption('output')
         );
-	}
+
+        return Command::SUCCESS;
+    }
 }

@@ -1,0 +1,9 @@
+framework:
+  secret: "test"
+  test: ~
+
+twig:
+  paths:
+    - '%kernel.project_dir%/../../templates'
+  debug: '%kernel.debug%'
+  strict_variables: true

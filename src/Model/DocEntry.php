@@ -6,58 +6,29 @@ namespace Headsnet\LivingDocumentationBundle\Model;
 use Headsnet\LivingDocumentation\Annotation\LivingDocumentationAnnotation;
 
 /**
- * Represents the data from a single documentation annotation in the source code
+ * Represents the data from a single documentation attribute in the source code
  */
-final class DocEntry
+final readonly class DocEntry
 {
-    /**
-     * @var string
-     */
-    private $class;
-
-    /**
-     * @var string
-     */
-    private $shortClass;
-
-    /**
-     * @var LivingDocumentationAnnotation
-     */
-    private $annotation;
-
-    /**
-     * @param string                        $class
-     * @param string                        $shortClass
-     * @param LivingDocumentationAnnotation $annotation
-     */
-    public function __construct(string $class, string $shortClass, LivingDocumentationAnnotation $annotation)
-    {
-        $this->class = $class;
-        $this->shortClass = $shortClass;
-        $this->annotation = $annotation;
+    public function __construct(
+        private string $class,
+        private string $shortClass,
+        private LivingDocumentationAnnotation $attribute
+    ) {
     }
 
-    /**
-     * @return string
-     */
     public function class(): string
     {
         return $this->class;
     }
 
-    /**
-     * @return string
-     */
     public function shortClass(): string
     {
         return $this->shortClass;
     }
 
-    /**
-     * @return LivingDocumentationAnnotation
-     */
-    public function annotation(): LivingDocumentationAnnotation
+    public function attribute(): LivingDocumentationAnnotation
     {
-        return $this->annotation;
+        return $this->attribute;
     }
 }

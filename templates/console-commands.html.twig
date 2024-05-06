@@ -6,10 +6,10 @@ Model Documentation for: {{ namespace }}
 ## Console Commands
 
 {% for result in data.Infrastructure_ConsoleCommand %}
-#### _{{ result.annotation.commandName }}_
-{% if result.annotation.description %}
+#### _{{ result.attribute.commandName }}_
+{% if result.attribute.description %}
 
-{{ result.annotation.description }}
+{{ result.attribute.description }}
 {% endif %}
 
 `{{ namespace }}{{ result.class }}`

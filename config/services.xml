@@ -7,44 +7,44 @@
 
         <service id="headsnet_livedoc.processor.guided_tour_builder" class="Headsnet\LivingDocumentationBundle\Services\Processor\GuidedTourBuilder"/>
 
-        <service id="headsnet_livedoc.subscriber.console_commands" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishConsoleCommands">
+        <service id="headsnet_livedoc.subscriber.console_commands" class="Headsnet\LivingDocumentationBundle\Publisher\PublishConsoleCommands">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="headsnet_livedoc.subscriber.email_messages" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishEmailMessages">
+        <service id="headsnet_livedoc.subscriber.email_messages" class="Headsnet\LivingDocumentationBundle\Publisher\PublishEmailMessages">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="headsnet_livedoc.subscriber.event_actions" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishEventActions">
+        <service id="headsnet_livedoc.subscriber.event_actions" class="Headsnet\LivingDocumentationBundle\Publisher\PublishEventActions">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="headsnet_livedoc.subscriber.glossary" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishGlossary">
+        <service id="headsnet_livedoc.subscriber.glossary" class="Headsnet\LivingDocumentationBundle\Publisher\PublishGlossary">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="headsnet_livedoc.subscriber.guided_tour" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishGuidedTour">
+        <service id="headsnet_livedoc.subscriber.guided_tour" class="Headsnet\LivingDocumentationBundle\Publisher\PublishGuidedTour">
             <argument type="service" id="twig"/>
             <argument type="service" id="headsnet_livedoc.processor.guided_tour_builder"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="headsnet_livedoc.subscriber.use_cases" class="Headsnet\LivingDocumentationBundle\EventSubscriber\PublishUseCases">
+        <service id="headsnet_livedoc.subscriber.use_cases" class="Headsnet\LivingDocumentationBundle\Publisher\PublishUseCases">
             <argument type="service" id="twig"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="headsnet_livedoc.annotation_loader" class="Headsnet\LivingDocumentationBundle\Services\AnnotationLoader">
+        <service id="headsnet_livedoc.attribute_loader" class="Headsnet\LivingDocumentationBundle\Services\AttributeLoader">
             <argument type="service" id="event_dispatcher"/>
             <argument type="string" id="%kernel.project_dir%"/>
         </service>
 
         <service id="headsnet_livedoc.command.publish" class="Headsnet\LivingDocumentationBundle\Console\PublishCommand">
-            <argument type="service" id="headsnet_livedoc.annotation_loader"/>
+            <argument type="service" id="headsnet_livedoc.attribute_loader"/>
             <tag name="console.command"/>
         </service>
 

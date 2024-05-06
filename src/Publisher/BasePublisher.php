@@ -1,62 +1,45 @@
 <?php
 declare(strict_types=1);
 
-namespace Headsnet\LivingDocumentationBundle\EventSubscriber;
+namespace Headsnet\LivingDocumentationBundle\Publisher;
 
-use Headsnet\LivingDocumentationBundle\Event\PublishDocumentation;
+use Headsnet\LivingDocumentationBundle\Services\PublishDocumentation;
 use Symfony\Component\Filesystem\Filesystem;
 use Twig\Environment;
 use Twig\Error\Error;
 
-/**
- * @property string $template
- */
 abstract class BasePublisher
 {
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected string $template;
 
-    /**
-     * @param Environment $twig
-     */
-    public function __construct(Environment $twig)
-    {
-        $this->twig = $twig;
+    public function __construct(
+        protected Environment $twig
+    ) {
     }
 
     /**
-     * @return array
+     * @return array<string, array<string>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PublishDocumentation::class => ['build'],
         ];
     }
 
-    /**
-     * @param PublishDocumentation $event
-     *
-     * @throws \Exception
-     */
-    public function build(PublishDocumentation $event)
+    public function build(PublishDocumentation $event): void
     {
-        if (empty($this->template))
-        {
+        if (empty($this->template)) {
             throw new \Exception('Publisher template must be specified!');
         }
 
-        try
-        {
+        try {
             $markdown = $this->twig->render(sprintf('%s.html.twig', $this->template), [
                 'data' => $event->getData(),
-                'namespace' => $event->getNamespace()
+                'namespace' => $event->getNamespace(),
             ]);
         }
-        catch (Error $e)
-        {
+        catch (Error $e) {
             die('Error rendering output template:' . $e->getMessage());
         }
 

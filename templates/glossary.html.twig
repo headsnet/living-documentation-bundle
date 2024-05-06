@@ -7,10 +7,10 @@ Model Documentation for: {{ namespace }}
 
 {% for result in data.DDD_CoreConcept %}
 #### {{ result.shortClass }}
-######_{{ result.annotation.summary }}_
-{% if result.annotation.description %}
+###### _{{ result.attribute.summary }}_
+{% if result.attribute.description %}
 
-{{ result.annotation.description }}
+{{ result.attribute.description }}
 {% endif %}
 
 `{{ namespace }}{{ result.class }}`

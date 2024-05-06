@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Headsnet\LivingDocumentationBundle\EventSubscriber;
+namespace Headsnet\LivingDocumentationBundle\Publisher;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -10,5 +10,5 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class PublishConsoleCommands extends BasePublisher implements EventSubscriberInterface
 {
-    protected $template = 'console-commands';
+    protected string $template = 'console-commands';
 }

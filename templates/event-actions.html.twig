@@ -6,8 +6,8 @@ Model Documentation for: {{ namespace }}
 ## Event Actions
 
 {% for result in data.Patterns_EventHandler %}
-#### _{{ result.annotation.event }}_
-_{{ result.annotation.description|default('No description available') }}_
+#### _{{ result.attribute.event }}_
+_{{ result.attribute.description|default('No description available') }}_
 
 `{{ namespace }}{{ result.class }}`
 
